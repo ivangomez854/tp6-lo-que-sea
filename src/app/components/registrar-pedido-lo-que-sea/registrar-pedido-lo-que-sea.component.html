@@ -1,18 +1,46 @@
+<form [formGroup]="form">
 <mat-card class="mat-elevation-z4 p-3 width-100">
   <div class="row pt-2">
     <h2>Qué te gustaría que busquemos?</h2>
   </div>
-  <div class="row pt-2">
-    <div class="col-sm-10">
-      <mat-form-field appearance="outline" style="width: 100%">
-        <mat-label>Descipción</mat-label>
-        <textarea matInput rows="2" style="resize: none"></textarea>
-      </mat-form-field>
+  <div [formGroup]="fgPedido">
+    <div class="row pt-2">
+      <div class="col-sm-10">
+        <mat-form-field appearance="outline" style="width: 100%">
+          <mat-label>Descipción</mat-label>
+          <textarea matInput rows="2" style="resize: none" [formControl]="txDescripcion"></textarea>
+        </mat-form-field>
+      </div>
     </div>
-    <div class="col-sm-2 mt-auto mb-3">
-      <button class="btn" mat-icon-button matTooltip="Subir foto">
-        <mat-icon color="primary">photo_camera</mat-icon>
-      </button>
+
+    <div class="row">
+      <div class="col-sm-6 col-12">
+        <input
+          type="file"
+          #fileInput
+          id="uploadFile"
+          name="uploadFile"
+          accept=".jpg,.jpeg"
+          (change)="seleccionarArchivo(fileInput)"
+          [attr.maxFileSize]="maxTamanioArchivos"
+        />
+      </div>
     </div>
   </div>
+  <hr>
+  <h2>A dónde lo buscamos?</h2>
+  <app-domicilio [titulo]="'Domicilio del Comercio'"></app-domicilio>
+  <hr>
+  <h2>A dónde te lo llevamos?</h2>
+  <app-domicilio [titulo]="'Domicilio del entrega'"></app-domicilio>
+  <hr>
+  <div class="d-flex justify-content-center">
+    <button class="btn" mat-raised-button hidden="true">
+      Editar pedido
+    </button>
+    <button class="btn" mat-raised-button>
+      Calcular envío
+    </button>
+  </div>
 </mat-card>
+</form>

@@ -12,6 +12,7 @@ import {
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {DomicilioComponent} from './components/domicilio/domicilio.component';
 import {SharedModule} from "./shared/shared.module";
+import {ReactiveFormsModule} from "@angular/forms";
 
 @NgModule({
   declarations: [
@@ -21,13 +22,14 @@ import {SharedModule} from "./shared/shared.module";
     RegistrarPedidoLoQueSeaComponent,
     DomicilioComponent
   ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    BrowserAnimationsModule,
-    NgbModule,
-    SharedModule
-  ],
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        BrowserAnimationsModule,
+        NgbModule,
+        SharedModule,
+        ReactiveFormsModule
+    ],
   providers: [],
   bootstrap: [AppComponent]
 })

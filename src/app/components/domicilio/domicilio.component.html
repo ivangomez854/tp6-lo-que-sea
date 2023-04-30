@@ -1,3 +1,29 @@
 <div class="row">
-
+  <div class="col">
+    <h4>{{titulo}}</h4>
+  </div>
+</div>
+<div class="row">
+  <div class="col-sm-5">
+    <mat-form-field appearance="outline" style="width: 90%">
+      <mat-label>Calle</mat-label>
+      <input matInput>
+    </mat-form-field>
+  </div>
+  <div class="col-sm-2">
+    <mat-form-field appearance="outline" style="width: 80%">
+      <mat-label>Número</mat-label>
+      <input matInput type="number">
+    </mat-form-field>
+  </div>
+  <div class="col-sm-3">
+    <mat-form-field appearance="outline" style="width: 100%">
+      <mat-label>Ciudad</mat-label>
+      <mat-select>
+        <mat-option value="1">Carlos Paz</mat-option>
+        <mat-option value="2">Córdoba</mat-option>
+        <mat-option value="3">San Francisco</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
 </div>
