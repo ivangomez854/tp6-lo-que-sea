@@ -5,6 +5,7 @@ import {DomicilioComponent} from "../domicilio/domicilio.component";
 import {TiposEnvioEnum} from "../../models/enums/tipos-envio.enum";
 import {distinctUntilChanged} from "rxjs";
 import * as moment from "moment";
+import {NgxSpinnerService} from "ngx-spinner";
 
 
 @Component({
@@ -14,8 +15,8 @@ import * as moment from "moment";
 })
 export class RegistrarPedidoLoQueSeaComponent implements OnInit{
   @ViewChild(MatStepper) stepper: MatStepper;
-  @ViewChild(DomicilioComponent) domicilioComercio: DomicilioComponent;
-  @ViewChild(DomicilioComponent) domicilioEntrega: DomicilioComponent;
+  @ViewChild('domicilioComercio', {static: true}) domicilioComercio: DomicilioComponent;
+  @ViewChild('domicilioEntrega', {static: true}) domicilioEntrega: DomicilioComponent;
 
   form: FormGroup;
   step1Completado = false;
@@ -23,7 +24,8 @@ export class RegistrarPedidoLoQueSeaComponent implements OnInit{
   step3Completado = false;
 
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder,
+              private spinnerService: NgxSpinnerService) {
   }
 
   ngOnInit() {
@@ -37,7 +39,7 @@ export class RegistrarPedidoLoQueSeaComponent implements OnInit{
         txFoto: [null]
       }),
       fgMomentoRecepcion: this.fb.group({
-        rbTiposEnvio: [TiposEnvioEnum.LO_ANTES_POSIBLE],
+        rbTiposEnvio: [TiposEnvioEnum.LO_ANTES_POSIBLE, [Validators.required]],
         dpFechaEnvio: [''],
         tpHoraEnvio: ['']
       })
@@ -48,13 +50,12 @@ export class RegistrarPedidoLoQueSeaComponent implements OnInit{
     this.rbTiposEnvio.valueChanges.pipe(distinctUntilChanged())
       .subscribe(res => {
         if (res === this.loAntesPosible) {
-          this.dpFechaEnvio.reset();
-          this.tpHoraEnvio.reset();
+          this.fgMomentoRecepcion.reset();
+
         } else {
-          this.dpFechaEnvio.setValidators([Validators.required])
-          this.tpHoraEnvio.setValidators([Validators.required])
+          this.dpFechaEnvio.setValidators([Validators.required]);
+          this.tpHoraEnvio.setValidators([Validators.required]);
         }
-        this.validarHoraMinima();
       });
 
     this.tpHoraEnvio.valueChanges.pipe(distinctUntilChanged())
@@ -78,7 +79,8 @@ export class RegistrarPedidoLoQueSeaComponent implements OnInit{
     const fecha = this.dpFechaEnvio.value;
     const hora = this.tpHoraEnvio.value;
     if (!fecha || fecha.isAfter(now, 'day')) {
-      this.tpHoraEnvio.setErrors(null);
+      this.tpHoraEnvio.clearValidators();
+      this.tpHoraEnvio.updateValueAndValidity();
       return;
     }
 
@@ -101,10 +103,18 @@ export class RegistrarPedidoLoQueSeaComponent implements OnInit{
   siguienteStep() {
     switch (this.stepper?.selectedIndex) {
       case 0:
-        this.completarStep1();
+        this.spinnerService.show()
+        setTimeout(() => {
+          this.completarStep1();
+          this.spinnerService.hide()
+        }, 3000);
         break;
       case 1:
-        this.completarStep2();
+        this.spinnerService.show()
+        setTimeout(() => {
+          this.completarStep2();
+          this.spinnerService.hide()
+        }, 3000);
         break;
       case 2:
         this.completarStep3();
@@ -140,7 +150,8 @@ export class RegistrarPedidoLoQueSeaComponent implements OnInit{
   }
 
   esValidoStep2(): boolean {
-    return this.domicilioEntrega.form.valid && this.fgMomentoRecepcion.valid;
+    return this.domicilioEntrega.form.valid && (this.rbTiposEnvio.value === this.loAntesPosible
+      || (this.rbTiposEnvio.value === this.pactarFecha && this.dpFechaEnvio.valid && this.tpHoraEnvio.valid));
   }
 
   completarStep1() {
@@ -210,6 +221,5 @@ export class RegistrarPedidoLoQueSeaComponent implements OnInit{
   get fechaMaxima(): Date {
     return new Date(this.fechaActual.getTime() + 7 * 24 * 60 * 60000); // Sumar 7 días en milisegundos
   }
-
   //endregion
 }

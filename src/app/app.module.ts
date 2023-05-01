@@ -17,6 +17,7 @@ import {NgxMatTimepickerModule} from "ngx-mat-timepicker";
 import {registerLocaleData} from '@angular/common';
 import localeEs from '@angular/common/locales/es';
 import {MAT_DATE_FORMATS} from '@angular/material/core';
+import {NgxSpinnerModule} from "ngx-spinner";
 
 export const MY_DATE_FORMATS = {
   parse: {
@@ -47,7 +48,7 @@ registerLocaleData(localeEs);
       SharedModule,
       ReactiveFormsModule,
       NgxMatTimepickerModule,
-
+      NgxSpinnerModule,
     ],
   providers: [{ provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMATS },],
   bootstrap: [AppComponent]
