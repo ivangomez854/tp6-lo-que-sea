@@ -13,7 +13,11 @@ import {BrowserModule} from "@angular/platform-browser";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {MatToolbarModule} from "@angular/material/toolbar";
 import {MatStepperModule} from "@angular/material/stepper";
-
+import {MatRadioModule} from "@angular/material/radio";
+import {MatDatepickerModule} from "@angular/material/datepicker";
+import {MatNativeDateModule} from "@angular/material/core";
+import { MatMomentDateModule } from '@angular/material-moment-adapter';
+import { MatTimepickerModule } from 'mat-timepicker';
 
 @NgModule({
   declarations: [],
@@ -31,7 +35,12 @@ import {MatStepperModule} from "@angular/material/stepper";
     BrowserModule,
     BrowserAnimationsModule,
     MatToolbarModule,
-    MatStepperModule
+    MatStepperModule,
+    MatRadioModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatMomentDateModule,
+    MatTimepickerModule,
   ],
   exports: [
     MatFormFieldModule,
@@ -46,7 +55,12 @@ import {MatStepperModule} from "@angular/material/stepper";
     BrowserModule,
     BrowserAnimationsModule,
     MatToolbarModule,
-    MatStepperModule
+    MatStepperModule,
+    MatRadioModule,
+    MatDatepickerModule,
+    MatTimepickerModule,
+    MatNativeDateModule,
+    MatMomentDateModule,
   ]
 })
 export class SharedModule {

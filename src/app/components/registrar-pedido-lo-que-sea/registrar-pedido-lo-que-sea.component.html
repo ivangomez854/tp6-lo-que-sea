@@ -1,46 +1,116 @@
-<form [formGroup]="form">
+<form [formGroup]="form" xmlns="http://www.w3.org/1999/html">
 <mat-card class="mat-elevation-z4 p-3 width-100">
-  <div class="row pt-2">
-    <h2>Qué te gustaría que busquemos?</h2>
-  </div>
-  <div [formGroup]="fgPedido">
-    <div class="row pt-2">
-      <div class="col-sm-10">
-        <mat-form-field appearance="outline" style="width: 100%">
-          <mat-label>Descipción</mat-label>
-          <textarea matInput rows="2" style="resize: none" [formControl]="txDescripcion"></textarea>
-        </mat-form-field>
+  <mat-horizontal-stepper>
+    <mat-step [completed]="step1Completado">
+      <ng-template matStepLabel>Datos del producto</ng-template>
+      <div class="row pt-2">
+        <h2>Qué te gustaría que busquemos?</h2>
       </div>
-    </div>
+      <div class="row pt-2">
+        <div class="col-sm-10">
+          <mat-form-field appearance="outline" style="width: 100%">
+            <mat-label>Descipción</mat-label>
+            <textarea matInput rows="2" style="resize: none" [formControl]="txDescripcion"></textarea>
+            <mat-error *ngIf="txDescripcion?.hasError('required')">Campo requerido</mat-error>
+          </mat-form-field>
+        </div>
+      </div>
 
-    <div class="row">
-      <div class="col-sm-6 col-12">
-        <input
-          type="file"
-          #fileInput
-          id="uploadFile"
-          name="uploadFile"
-          accept=".jpg,.jpeg"
-          (change)="seleccionarArchivo(fileInput)"
-          [attr.maxFileSize]="maxTamanioArchivos"
-        />
+      <div class="row">
+        <div class="col-sm-6 col-12">
+          <input
+            type="file"
+            #fileInput
+            id="uploadFile"
+            name="uploadFile"
+            accept=".jpg,.jpeg"
+            (change)="seleccionarArchivo(fileInput)"
+            [attr.maxFileSize]="maxTamanioArchivos"
+          />
+        </div>
+      </div>
+      <hr>
+      <h2>Dónde lo buscamos?</h2>
+      <app-domicilio [titulo]="'Domicilio del Comercio'"></app-domicilio>
+    </mat-step>
+
+    <mat-step [completed]="step2Completado" [editable]="step1Completado">
+      <ng-template matStepLabel>Datos del envío</ng-template>
+      <h2>A dónde te lo llevamos?</h2>
+      <app-domicilio [titulo]="'Domicilio del entrega'"></app-domicilio>
+
+      <hr>
+      <h4>Cuándo lo querés recibir?</h4>
+      <div [formGroup]="fgMomentoRecepcion">
+
+        <div class="row">
+          <div class="col">
+            <mat-radio-group [formControl]="rbTiposEnvio">
+              <mat-radio-button [value]="loAntesPosible" checked>Lo antes posible</mat-radio-button>
+              <mat-radio-button [value]="pactarFecha">Pactar visita</mat-radio-button>
+            </mat-radio-group>
+          </div>
+        </div>
+
+        <div *ngIf="rbTiposEnvio.value === pactarFecha">
+          <div class="row">
+            <div class="col-sm-4">
+              <mat-form-field>
+                <mat-label>Fecha</mat-label>
+                <input matInput [matDatepicker]="fechaPicker"
+                       [min]="fechaActual"
+                       [max]="fechaMaxima"
+                       (click)="fechaPicker.open()"
+                       (dateChange)="validarHoraMinima()"
+                       [formControl]="dpFechaEnvio">
+                <mat-datepicker-toggle matSuffix [for]="fechaPicker"></mat-datepicker-toggle>
+                <mat-datepicker #fechaPicker></mat-datepicker>
+                <mat-error *ngIf="dpFechaEnvio?.hasError('required')">Campo requerido</mat-error>
+              </mat-form-field>
+            </div>
+
+            <div class="col-sm-4">
+              <mat-form-field>
+                <mat-label>Hora</mat-label>
+                <input matInput
+                       name="selected_time_B"
+                       [formControl]="tpHoraEnvio"
+                       [format]="24"
+                       [ngxMatTimepicker]="pickerB"
+                       readonly/>
+                <mat-icon matSuffix
+                          (click)="pickerB.open()">
+                  watch_later
+                </mat-icon>
+                <mat-error *ngIf="tpHoraEnvio?.hasError('required')">Campo requerido</mat-error>
+              </mat-form-field>
+              <ngx-mat-timepicker color="accent" #pickerB></ngx-mat-timepicker>
+            </div>
+          </div>
+          <div class="row">
+            <mat-error class="error"  *ngIf="tpHoraEnvio.errors?.['horaInvalida']">
+              {{ tpHoraEnvio.errors?.['horaInvalida']?.mensaje }}
+            </mat-error>
+          </div>
+        </div>
+
+      </div>
+    </mat-step>
+    <mat-step [completed]="step3Completado" [editable]="step1Completado && step2Completado">
+      <ng-template matStepLabel>Datos del pago</ng-template>
+      <!-- Aquí colocas el formulario para cargar los datos del pago -->
+    </mat-step>
+  </mat-horizontal-stepper>
+  <div class="row pt-3">
+    <div class="col text-end">
+      <div class="float-right">
+        <button class="btn" mat-raised-button
+                [disabled]="!permiteAvanzarStep()"
+                (click)="siguienteStep()">
+          Siguiente
+        </button>
       </div>
     </div>
-  </div>
-  <hr>
-  <h2>A dónde lo buscamos?</h2>
-  <app-domicilio [titulo]="'Domicilio del Comercio'"></app-domicilio>
-  <hr>
-  <h2>A dónde te lo llevamos?</h2>
-  <app-domicilio [titulo]="'Domicilio del entrega'"></app-domicilio>
-  <hr>
-  <div class="d-flex justify-content-center">
-    <button class="btn" mat-raised-button hidden="true">
-      Editar pedido
-    </button>
-    <button class="btn" mat-raised-button>
-      Calcular envío
-    </button>
   </div>
 </mat-card>
 </form>

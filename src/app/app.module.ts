@@ -13,24 +13,43 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {DomicilioComponent} from './components/domicilio/domicilio.component';
 import {SharedModule} from "./shared/shared.module";
 import {ReactiveFormsModule} from "@angular/forms";
+import {NgxMatTimepickerModule} from "ngx-mat-timepicker";
+import {registerLocaleData} from '@angular/common';
+import localeEs from '@angular/common/locales/es';
+import {MAT_DATE_FORMATS} from '@angular/material/core';
 
+export const MY_DATE_FORMATS = {
+  parse: {
+    dateInput: 'DD/MM/YYYY',
+  },
+  display: {
+    dateInput: 'DD/MM/YYYY',
+    monthYearLabel: 'MMM YYYY',
+    dateA11yLabel: 'DD/MM/YYYY',
+    monthYearA11yLabel: 'MMMM YYYY',
+  },
+};
+
+registerLocaleData(localeEs);
 @NgModule({
   declarations: [
     AppComponent,
     HeaderComponent,
     FooterComponent,
     RegistrarPedidoLoQueSeaComponent,
-    DomicilioComponent
+    DomicilioComponent,
   ],
     imports: [
-        BrowserModule,
-        AppRoutingModule,
-        BrowserAnimationsModule,
-        NgbModule,
-        SharedModule,
-        ReactiveFormsModule
+      BrowserModule,
+      AppRoutingModule,
+      BrowserAnimationsModule,
+      NgbModule,
+      SharedModule,
+      ReactiveFormsModule,
+      NgxMatTimepickerModule,
+
     ],
-  providers: [],
+  providers: [{ provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMATS },],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

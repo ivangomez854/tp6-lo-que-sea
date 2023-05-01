@@ -1,3 +1,12 @@
 mat-hint {
   font-size: smaller;
 }
+
+::ng-deep mat-card {
+  background-color: #faf0ca!important;
+}
+
+::ng-deep mat-horizontal-stepper {
+  border-radius: 15px;
+  //background-color: #FAF0CA!important;
+}
