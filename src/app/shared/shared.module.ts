@@ -41,6 +41,7 @@ import {MatTimepickerModule} from 'mat-timepicker';
     MatNativeDateModule,
     MatMomentDateModule,
     MatTimepickerModule,
+    MatDialogModule
   ],
   exports: [
     MatFormFieldModule,
@@ -61,6 +62,7 @@ import {MatTimepickerModule} from 'mat-timepicker';
     MatTimepickerModule,
     MatNativeDateModule,
     MatMomentDateModule,
+    MatDialogModule
   ]
 })
 export class SharedModule {

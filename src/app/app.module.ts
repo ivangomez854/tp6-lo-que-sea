@@ -18,6 +18,8 @@ import {registerLocaleData} from '@angular/common';
 import localeEs from '@angular/common/locales/es';
 import {MAT_DATE_FORMATS} from '@angular/material/core';
 import {NgxSpinnerModule} from "ngx-spinner";
+import { PagoTarjetaComponent } from './components/pago-tarjeta/pago-tarjeta.component';
+import { ResumenPedidoComponent } from './components/resumen-pedido/resumen-pedido.component';
 
 export const MY_DATE_FORMATS = {
   parse: {
@@ -39,6 +41,8 @@ registerLocaleData(localeEs);
     FooterComponent,
     RegistrarPedidoLoQueSeaComponent,
     DomicilioComponent,
+    PagoTarjetaComponent,
+    ResumenPedidoComponent,
   ],
     imports: [
       BrowserModule,

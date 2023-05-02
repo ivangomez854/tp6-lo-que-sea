@@ -1,6 +1,6 @@
 <form [formGroup]="form" xmlns="http://www.w3.org/1999/html">
-  <mat-card class="mat-elevation-z4 p-3 width-100">
-    <mat-horizontal-stepper>
+  <mat-card class="mat-elevation-z4 p-4 width-100">
+    <mat-horizontal-stepper class="pt-3">
       <mat-step [completed]="step1Completado">
         <ng-template matStepLabel>Datos del producto</ng-template>
         <div class="row pt-2">
@@ -101,6 +101,7 @@
       <mat-step [completed]="step3Completado" [editable]="step1Completado && step2Completado">
         <ng-template matStepLabel>Datos del pago</ng-template>
         <!-- Aquí colocas el formulario para cargar los datos del pago -->
+        <app-pago-tarjeta></app-pago-tarjeta>
       </mat-step>
     </mat-horizontal-stepper>
     <div class="row pt-3">

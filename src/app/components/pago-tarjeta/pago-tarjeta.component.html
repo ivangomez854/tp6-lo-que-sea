@@ -1,0 +1,49 @@
+<form [formGroup]="form">
+  <div class="row">
+    <div class="col">
+      <mat-form-field appearance="outline" style="width: 90%">
+        <mat-label>NOMBRE Y APELLIDO DEL TITULAR</mat-label>
+        <input matInput [formControl]="txNombreTitular">
+        <mat-error *ngIf="txNombreTitular?.hasError('required')">Campo requerido</mat-error>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <mat-form-field appearance="outline" style="width: 90%">
+        <mat-label>NÚMERO DE TARJETA</mat-label>
+        <input matInput [formControl]="txNumeroTarjeta">
+        <mat-hint class="text-info">16 dígitos</mat-hint>
+        <mat-error *ngIf="txNumeroTarjeta?.hasError('required')">Campo requerido</mat-error>
+        <mat-error *ngIf="txNumeroTarjeta?.hasError('pattern')">El número no corresponde a una tarjeta Visa</mat-error>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-sm-6">
+      <mat-form-field appearance="outline" style="width: 90%">
+        <mat-label>FECHA DE VENCIMIENTO</mat-label>
+        <input matInput [formControl]="dpVencimiento">
+        <mat-hint class="text-info">DD / YYYY</mat-hint>
+        <mat-error *ngIf="dpVencimiento?.hasError('required')">Campo requerido</mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="col-sm-3">
+      <mat-form-field appearance="outline" style="width: 90%">
+        <mat-label>CÓDIGO DE SEGURIDAD</mat-label>
+        <input matInput type="numeric" [formControl]="txCodigoSeguridad" maxlength="3">
+        <mat-hint class="text-info">3 dígitos en el reverso</mat-hint>
+        <mat-error *ngIf="txCodigoSeguridad?.hasError('required')">Campo requerido</mat-error>
+        <mat-error *ngIf="txCodigoSeguridad?.hasError('patter')">Número inválido</mat-error>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <div class="float-end">
+    <button mat-raised-button mat-button class="btn">REALIZAR PAGO</button>
+  </div>
+
+</form>
