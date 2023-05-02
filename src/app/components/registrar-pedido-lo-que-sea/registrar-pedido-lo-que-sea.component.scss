@@ -6,6 +6,10 @@ mat-hint {
   background-color: #faf0ca!important;
 }
 
+::ng-deep .mat-step-icon {
+  background-color: #EE964B!important;
+}
+
 ::ng-deep mat-horizontal-stepper {
   border-radius: 15px;
   //background-color: #FAF0CA!important;

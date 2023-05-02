@@ -6,6 +6,10 @@ import {TiposEnvioEnum} from "../../models/enums/tipos-envio.enum";
 import {distinctUntilChanged} from "rxjs";
 import * as moment from "moment";
 import {NgxSpinnerService} from "ngx-spinner";
+import {PagoTarjetaComponent} from "../pago-tarjeta/pago-tarjeta.component";
+import {Pedido} from "../../models/pedido.model";
+import {DatePipe} from "@angular/common";
+import {TarjetaCredito} from "../../models/tarjeta-credito.model";
 
 
 @Component({
@@ -14,18 +18,22 @@ import {NgxSpinnerService} from "ngx-spinner";
   styleUrls: ['./registrar-pedido-lo-que-sea.component.scss']
 })
 export class RegistrarPedidoLoQueSeaComponent implements OnInit{
-  @ViewChild(MatStepper) stepper: MatStepper;
+  @ViewChild('steper') stepper: MatStepper;
   @ViewChild('domicilioComercio', {static: true}) domicilioComercio: DomicilioComponent;
   @ViewChild('domicilioEntrega', {static: true}) domicilioEntrega: DomicilioComponent;
+  @ViewChild('pagoTarjeta', {static: true}) pagoTarjeta: PagoTarjetaComponent;
 
   form: FormGroup;
   step1Completado = false;
   step2Completado = false;
   step3Completado = false;
 
+  pedido: Pedido = new Pedido();
+
 
   constructor(private fb: FormBuilder,
-              private spinnerService: NgxSpinnerService) {
+              private spinnerService: NgxSpinnerService,
+              private datePipe: DatePipe) {
   }
 
   ngOnInit() {
@@ -98,28 +106,42 @@ export class RegistrarPedidoLoQueSeaComponent implements OnInit{
     }
   }
 
+  generarResumenPedidoPagado(resultado: boolean) {
+    if(resultado) {
+      const tarjeta = new TarjetaCredito();
+      tarjeta.entidad = 'VISA';
+      tarjeta.nombreTitular = this.pagoTarjeta.txNombreTitular.value;
+      tarjeta.numeroTarjeta = this.pagoTarjeta.txNumeroTarjeta.value;
+      // tarjeta.vencimiento = this.datePipe.transform(this.pagoTarjeta?.dpVencimiento?.value?.toDate(), 'dd/MM/yyyy'); //TODO VER COMO RESOLVER EL MOMENT
+      this.pedido.tarjeta = tarjeta;
+
+      console.table(this.pedido);
+    }
+  }
+
   //region stepper
   // Para avanzar al siguiente paso:
   siguienteStep() {
     switch (this.stepper?.selectedIndex) {
       case 0:
+        this.completarStep1();
         this.spinnerService.show()
         setTimeout(() => {
-          this.completarStep1();
           this.spinnerService.hide()
+          this.stepper.next();
         }, 3000);
         break;
       case 1:
+        this.completarStep2();
         this.spinnerService.show()
         setTimeout(() => {
-          this.completarStep2();
           this.spinnerService.hide()
+          this.stepper.next();
         }, 3000);
         break;
       case 2:
         this.completarStep3();
     }
-    this.stepper.next();
   }
 
   // Para retroceder al paso anterior:
@@ -155,17 +177,41 @@ export class RegistrarPedidoLoQueSeaComponent implements OnInit{
   }
 
   completarStep1() {
-    if (this.fgPedido.touched && this.fgPedido.valid) {
+      this.pedido.descripcionProducto = this.txDescripcion.value || '';
+      this.pedido.archivoAdjunto = this.txFoto.value || '';
+      this.pedido.direccionComercio = this.domicilioComercio.obtenerDomicilioConcatenado() || '';
       this.step1Completado = true;
-    }
+      console.table(this.pedido);
   }
 
   completarStep2() {
+    this.pedido.direccionEntrega = this.domicilioEntrega.obtenerDomicilioConcatenado() || '';
+    this.pedido.tipoEnvio = this.rbTiposEnvio.value;
+    if (this.pedido.tipoEnvio === TiposEnvioEnum.PACTAR_FECHA) {
+      this.pedido.momentoEntrega = 'Fecha: ' + this.datePipe.transform(this.dpFechaEnvio.value, 'dd/MM/yyyy') + ' Hora: ' + this.tpHoraEnvio.value;
+    }
     this.step2Completado = true;
+    console.table(this.pedido);
   }
 
   completarStep3() {
     this.step3Completado = true;
+  }
+
+  cancelar() {
+    this.stepper.reset();
+    this.stepper.disableRipple = true;
+    this.fgPedido.reset();
+    this.fgMomentoRecepcion.reset();
+    this.form.clearValidators();
+    this.domicilioEntrega.form.reset();
+    this.domicilioComercio.form.reset();
+    this.pagoTarjeta.form.reset();
+
+  }
+
+  desactivarStepsPedido() {
+    this.stepper.disableRipple = false;
   }
   //endregion
 

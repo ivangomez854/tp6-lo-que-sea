@@ -14,12 +14,17 @@ import {DomicilioComponent} from './components/domicilio/domicilio.component';
 import {SharedModule} from "./shared/shared.module";
 import {ReactiveFormsModule} from "@angular/forms";
 import {NgxMatTimepickerModule} from "ngx-mat-timepicker";
-import {registerLocaleData} from '@angular/common';
+import {DatePipe, registerLocaleData} from '@angular/common';
 import localeEs from '@angular/common/locales/es';
 import {MAT_DATE_FORMATS} from '@angular/material/core';
 import {NgxSpinnerModule} from "ngx-spinner";
-import { PagoTarjetaComponent } from './components/pago-tarjeta/pago-tarjeta.component';
-import { ResumenPedidoComponent } from './components/resumen-pedido/resumen-pedido.component';
+import {PagoTarjetaComponent} from './components/pago-tarjeta/pago-tarjeta.component';
+import {ResumenPedidoComponent} from './components/resumen-pedido/resumen-pedido.component';
+import 'moment/locale/es';
+import { MatMomentDateModule } from '@angular/material-moment-adapter';
+import { MAT_DATE_LOCALE } from '@angular/material/core';
+import * as moment from 'moment';
+import 'moment/locale/es';
 
 export const MY_DATE_FORMATS = {
   parse: {
@@ -54,7 +59,22 @@ registerLocaleData(localeEs);
       NgxMatTimepickerModule,
       NgxSpinnerModule,
     ],
-  providers: [{ provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMATS },],
+  providers: [{ provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMATS },
+    { provide: MAT_DATE_LOCALE, useValue: 'es' },
+    { provide: MAT_DATE_FORMATS, useValue: {
+        parse: {
+          dateInput: 'MM/YYYY',
+        },
+        display: {
+          dateInput: 'MM/YYYY',
+          monthYearLabel: 'MMM YYYY',
+          dateA11yLabel: 'MM/YYYY',
+          monthYearA11yLabel: 'MMMM YYYY',
+        },
+      }
+    },
+    DatePipe
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -21,12 +21,24 @@ export class DomicilioComponent implements  OnInit{
   private crearForm() {
     this.form = this.fb.group({
       txCalle: ['', Validators.required],
-      txNumero: [null, Validators.required],
+      txNumero: ['', Validators.required],
       cbCiudad: [null, Validators.required],
       txReferencias: ['']
     })
   }
 
+  obtenerCiudad(): string {
+    switch (+this.cbCiudad.value) {
+      case 1: return 'Carlos Paz';
+      case 2: return 'Córdoba';
+      case 3: return 'San Francisco';
+    }
+    return '';
+  }
+
+  obtenerDomicilioConcatenado(): string {
+    return this.txCalle.value + ' ' + +this.txNumero.value + ' - Cdad. ' + this.obtenerCiudad() + ' - Ref: ' + this.txReferencias.value;
+  }
 
   get txCalle(): FormControl {
     return this.form.get('txCalle') as FormControl;

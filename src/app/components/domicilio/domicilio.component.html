@@ -15,7 +15,7 @@
   <div class="col-sm-2">
     <mat-form-field appearance="outline" style="width: 80%">
       <mat-label>Número</mat-label>
-      <input matInput type="number" [min]="0" [formControl]="txNumero">
+      <input matInput type="number" matNumberInput [min]="0" [formControl]="txNumero">
       <mat-error *ngIf="txNumero?.hasError('required')">Campo requerido</mat-error>
     </mat-form-field>
   </div>

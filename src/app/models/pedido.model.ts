@@ -1,6 +1,6 @@
 import {TiposEnvioEnum} from "./enums/tipos-envio.enum";
 import {TiposPagoEnum} from "./enums/tipos-pago.enum";
-import {TarjetaCredito} from "./enums/tarjeta-credito.model";
+import {TarjetaCredito} from "./tarjeta-credito.model";
 
 export class Pedido {
 

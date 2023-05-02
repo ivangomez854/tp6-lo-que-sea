@@ -1,6 +1,6 @@
 <form [formGroup]="form" xmlns="http://www.w3.org/1999/html">
   <mat-card class="mat-elevation-z4 p-4 width-100">
-    <mat-horizontal-stepper class="pt-3">
+    <mat-horizontal-stepper #steper [linear]="true" editable="false" class="pt-3">
       <mat-step [completed]="step1Completado">
         <ng-template matStepLabel>Datos del producto</ng-template>
         <div class="row pt-2">
@@ -34,7 +34,7 @@
         <app-domicilio #domicilioComercio [titulo]="'Domicilio del Comercio'"></app-domicilio>
       </mat-step>
 
-      <mat-step [completed]="step2Completado" [editable]="step1Completado">
+      <mat-step [completed]="step2Completado">
         <ng-template matStepLabel>Datos del envío</ng-template>
         <h2>A dónde te lo llevamos?</h2>
         <app-domicilio #domicilioEntrega [titulo]="'Domicilio del entrega'"></app-domicilio>
@@ -98,16 +98,23 @@
 
         </div>
       </mat-step>
-      <mat-step [completed]="step3Completado" [editable]="step1Completado && step2Completado">
+      <mat-step [completed]="step3Completado">
         <ng-template matStepLabel>Datos del pago</ng-template>
         <!-- Aquí colocas el formulario para cargar los datos del pago -->
-        <app-pago-tarjeta></app-pago-tarjeta>
+        <div class="pt-2">
+          <app-pago-tarjeta #pagoTarjeta
+                            (resultadoPago)="generarResumenPedidoPagado($event)"
+          ></app-pago-tarjeta>
+        </div>
       </mat-step>
     </mat-horizontal-stepper>
     <div class="row pt-3">
       <div class="col text-end">
         <div class="float-right">
-          <button class="btn" mat-raised-button
+          <button class="btn me-3" mat-raised-button
+                  (click)="cancelar()">
+            Cancelar
+          </button><button class="btn" mat-raised-button
                   [disabled]="!permiteAvanzarStep()"
                   (click)="siguienteStep()">
             Siguiente

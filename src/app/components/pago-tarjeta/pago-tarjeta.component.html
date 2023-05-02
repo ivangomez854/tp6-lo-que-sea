@@ -13,7 +13,7 @@
     <div class="col">
       <mat-form-field appearance="outline" style="width: 90%">
         <mat-label>NÚMERO DE TARJETA</mat-label>
-        <input matInput [formControl]="txNumeroTarjeta">
+        <input matInput type="number" [formControl]="txNumeroTarjeta">
         <mat-hint class="text-info">16 dígitos</mat-hint>
         <mat-error *ngIf="txNumeroTarjeta?.hasError('required')">Campo requerido</mat-error>
         <mat-error *ngIf="txNumeroTarjeta?.hasError('pattern')">El número no corresponde a una tarjeta Visa</mat-error>
@@ -25,25 +25,43 @@
     <div class="col-sm-6">
       <mat-form-field appearance="outline" style="width: 90%">
         <mat-label>FECHA DE VENCIMIENTO</mat-label>
-        <input matInput [formControl]="dpVencimiento">
-        <mat-hint class="text-info">DD / YYYY</mat-hint>
+        <input matInput [matDatepicker]="picker"
+               [formControl]="dpVencimiento"
+               [min]="maxDate"
+               (click)="picker.open()"
+               placeholder="MM/YYYY"
+               maxlength="7">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker startView="multi-year"
+                        (monthSelected)="formatearFecha($event, picker)"
+                        multiYearSelect="true">
+
+        </mat-datepicker>
+        <mat-hint class="text-info">MM / YYYY</mat-hint>
         <mat-error *ngIf="dpVencimiento?.hasError('required')">Campo requerido</mat-error>
+        <mat-error *ngIf="dpVencimiento?.hasError('matDatepickerParse')">Fecha de vencimiento inválida</mat-error>
       </mat-form-field>
     </div>
 
     <div class="col-sm-3">
       <mat-form-field appearance="outline" style="width: 90%">
         <mat-label>CÓDIGO DE SEGURIDAD</mat-label>
-        <input matInput type="numeric" [formControl]="txCodigoSeguridad" maxlength="3">
+        <input matInput type="password" [formControl]="txCodigoSeguridad" maxlength="3">
         <mat-hint class="text-info">3 dígitos en el reverso</mat-hint>
         <mat-error *ngIf="txCodigoSeguridad?.hasError('required')">Campo requerido</mat-error>
-        <mat-error *ngIf="txCodigoSeguridad?.hasError('patter')">Número inválido</mat-error>
+        <mat-error *ngIf="txCodigoSeguridad?.hasError('pattern')">Debe ingresar solo números</mat-error>
       </mat-form-field>
     </div>
   </div>
 
   <div class="float-end">
-    <button mat-raised-button mat-button class="btn">REALIZAR PAGO</button>
+    <button mat-raised-button
+            type="button"
+            class="btn"
+            (click)="realizarPago()"
+            [ngClass]="permitePagar() ? 'btn-primary' : ''"
+            [disabled]="!permitePagar()"
+    >REALIZAR PAGO</button>
   </div>
 
 </form>
