@@ -110,7 +110,7 @@
         <div class="col-sm-4">
           <mat-form-field appearance="outline" style="width: 100%">
             <mat-label>Titular:</mat-label>
-            <input matInput disabled value="{{pedido.tarjeta?.nombreTitular}}">
+            <input matInput disabled value="{{pedido.tarjeta?.nombreTitular | uppercase}}">
           </mat-form-field>
         </div>
       </div>
@@ -133,9 +133,8 @@
 
   <div mat-dialog-actions class="d-flex justify-content-end">
     <button
-      class="btn" mat-icon-button mat-dialog-close
-      matTooltip="Aceptar">
-      <mat-icon>arrow_right_alt</mat-icon>
+      class="btn" mat-raised-button mat-dialog-close>
+      Cerrar
     </button>
   </div>
 </div>

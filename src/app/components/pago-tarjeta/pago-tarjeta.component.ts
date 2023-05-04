@@ -70,7 +70,8 @@ export class PagoTarjetaComponent {
     return this.form.get('txCodigoSeguridad') as FormControl;
   }
 
-  get maxDate(): Date {
-    return new Date();
+  get minDate(): Date {
+    const today = new Date();
+    return new Date(today.getFullYear(), today.getMonth(), 1);
   }
 }

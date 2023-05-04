@@ -8,7 +8,7 @@ import * as moment from "moment";
 import {NgxSpinnerService} from "ngx-spinner";
 import {PagoTarjetaComponent} from "../pago-tarjeta/pago-tarjeta.component";
 import {Pedido} from "../../models/pedido.model";
-import {DatePipe} from "@angular/common";
+import {DatePipe, Location} from "@angular/common";
 import {TarjetaCredito} from "../../models/tarjeta-credito.model";
 import {MatDialog} from "@angular/material/dialog";
 import {ResumenPedidoComponent} from "../resumen-pedido/resumen-pedido.component";
@@ -40,7 +40,8 @@ export class RegistrarPedidoLoQueSeaComponent implements OnInit {
               private spinnerService: NgxSpinnerService,
               private datePipe: DatePipe,
               private dialog: MatDialog,
-              private cdr: ChangeDetectorRef) {
+              private cdr: ChangeDetectorRef,
+              private location: Location) {
   }
 
   ngOnInit() {
@@ -178,11 +179,15 @@ export class RegistrarPedidoLoQueSeaComponent implements OnInit {
       this.form.disable()
       this.domicilioComercio.form.disable();
       this.domicilioEntrega.form.disable();
-      this.completarStep3();
+      if(this.pagoTarjeta) {
+        this.pagoTarjeta.form.disable();
+      }
+
 
       this.spinnerService.show();
       setTimeout(() => {
         this.spinnerService.hide();
+        this.completarStep3();
         this.mostrarPedido();
       }, 3000);
     }
@@ -196,6 +201,14 @@ export class RegistrarPedidoLoQueSeaComponent implements OnInit {
       width: 'auto',
       height: '90vh'
     });
+  }
+
+  reiniciarSimulacion() {
+    const currentUrl = this.location.path();
+    // @ts-ignore
+    window.location.href = currentUrl;
+    // @ts-ignore
+    window.location.reload();
   }
 
   //region stepper
@@ -272,7 +285,6 @@ export class RegistrarPedidoLoQueSeaComponent implements OnInit {
     this.domicilioEntrega.cbCiudad.setValue(this.domicilioComercio.cbCiudad.value);
     this.domicilioEntrega.cbCiudad.disable();
     this.step1Completado = true;
-    console.table(this.pedido);
   }
 
   completarStep2() {
@@ -283,7 +295,6 @@ export class RegistrarPedidoLoQueSeaComponent implements OnInit {
     }
     this.calcularDistanciaMonto();
     this.step2Completado = true;
-    console.table(this.pedido);
   }
 
   completarStep3() {

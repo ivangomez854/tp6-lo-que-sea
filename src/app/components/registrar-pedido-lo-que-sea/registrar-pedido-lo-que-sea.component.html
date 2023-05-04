@@ -12,6 +12,7 @@
               <mat-label>Descipción</mat-label>
               <textarea matInput rows="2" style="resize: none" [formControl]="txDescripcion"></textarea>
               <mat-error *ngIf="txDescripcion?.hasError('required')">Campo requerido</mat-error>
+              <mat-error *ngIf="txDescripcion?.hasError('maxlength')">Permitido hasta 20 caracteres</mat-error>
             </mat-form-field>
           </div>
         </div>
@@ -183,6 +184,9 @@
       <div class="col text-end">
         <div class="float-right">
           <button *ngIf="step3Completado" class="btn me-3" mat-raised-button
+                  (click)="reiniciarSimulacion()">
+            Reiniciar
+          </button>          <button *ngIf="step3Completado" class="btn me-3" mat-raised-button
                   (click)="mostrarPedido()">
             Ver pedido
           </button>

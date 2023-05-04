@@ -1,5 +1,5 @@
 <form [formGroup]="form">
-  <div class="row">
+  <div class="row pt-2">
     <div class="col">
       <mat-form-field appearance="outline" style="width: 90%">
         <mat-label>NOMBRE Y APELLIDO DEL TITULAR</mat-label>
@@ -9,7 +9,7 @@
     </div>
   </div>
 
-  <div class="row">
+  <div class="row pt-2">
     <div class="col">
       <mat-form-field appearance="outline" style="width: 90%">
         <mat-label>NÚMERO DE TARJETA</mat-label>
@@ -22,13 +22,13 @@
     </div>
   </div>
 
-  <div class="row">
+  <div class="row pt-2">
     <div class="col-sm-6">
       <mat-form-field appearance="outline" style="width: 90%">
         <mat-label>FECHA DE VENCIMIENTO</mat-label>
         <input matInput [matDatepicker]="picker"
                [formControl]="dpVencimiento"
-               [min]="maxDate"
+               [min]="minDate"
                (click)="picker.open()"
                placeholder="MM/YYYY"
                maxlength="7">
