@@ -3,7 +3,7 @@
     <mat-horizontal-stepper #steper [linear]="true" editable="false" class="pt-3">
       <mat-step [completed]="step1Completado">
         <ng-template matStepLabel>Datos del producto</ng-template>
-        <div class="row pt-2">
+        <div class="row pt-3">
           <h2>Qué te gustaría que busquemos?</h2>
         </div>
         <div class="row pt-2">
@@ -36,11 +36,12 @@
 
       <mat-step [completed]="step2Completado">
         <ng-template matStepLabel>Datos del envío</ng-template>
-        <h2>A dónde te lo llevamos?</h2>
+        <div class="row pt-3">
+          <h2>A dónde te lo llevamos?</h2>
+        </div>
         <app-domicilio #domicilioEntrega [titulo]="'Domicilio del entrega'"></app-domicilio>
-
         <hr>
-        <h4>Cuándo lo querés recibir?</h4>
+        <h2>Cuándo lo querés recibir?</h2>
         <div [formGroup]="fgMomentoRecepcion">
 
           <div class="row">
@@ -101,20 +102,96 @@
       <mat-step [completed]="step3Completado">
         <ng-template matStepLabel>Datos del pago</ng-template>
         <!-- Aquí colocas el formulario para cargar los datos del pago -->
-        <div class="pt-2">
-          <app-pago-tarjeta #pagoTarjeta
-                            (resultadoPago)="generarResumenPedidoPagado($event)"
-          ></app-pago-tarjeta>
+        <div class="pt-3">
+          <h2>Detalle del pedido</h2>
+          <div class="row">
+            <mat-form-field appearance="outline" style="width: 100%">
+              <mat-label>Descripción:</mat-label>
+              <input matInput disabled value="{{pedido.descripcionProducto | uppercase}}">
+            </mat-form-field>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <mat-form-field appearance="outline" style="width: 100%">
+                <mat-label>Dirección comercio:</mat-label>
+                <input matInput disabled value="{{pedido.direccionComercio | uppercase}}">
+              </mat-form-field>
+            </div>
+            <div class="col-sm-4">
+              <mat-form-field appearance="outline" style="width: 100%">
+                <mat-label>Dirección entrega:</mat-label>
+                <input matInput disabled value="{{pedido.direccionComercio | uppercase}}">
+              </mat-form-field>
+            </div>
+            <div class="col-sm-4">
+              <mat-form-field appearance="outline" style="width: 100%">
+                <mat-label>Fecha y hora entrega:</mat-label>
+                <input matInput disabled value="{{pedido.tipoEnvio === pactarFecha ? pedido.momentoEntrega : 'Lo antes posible' | uppercase}}">
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <mat-form-field appearance="outline" style="width: 100%">
+                <mat-label>Distancia en Km:</mat-label>
+                <input matInput disabled value="{{pedido.distanciaKm}}">
+              </mat-form-field>
+            </div>
+            <div class="col-sm-4 p-0 ps-2 pe-2 text-center">
+              <div class="total">
+                <h3>TOTAL: {{pedido.precio | currency}}</h3>
+              </div>
+            </div>
+
+          </div>
         </div>
+        <hr>
+        <h2>Cómo lo querés pagar?</h2>
+        <div [formGroup]="fgPago">
+        <div class="row">
+          <div class="col">
+            <mat-radio-group [formControl]="rbTiposPago">
+              <mat-radio-button [value]="efectivo" checked>Efectivo</mat-radio-button>
+              <mat-radio-button [value]="tarjetaVisa">Tarjeta VISA</mat-radio-button>
+            </mat-radio-group>
+          </div>
+        </div>
+          <div class="row" *ngIf="rbTiposPago.value === efectivo">
+            <div class="col-sm-6">
+              <mat-form-field appearance="outline" style="width: 80%">
+                <mat-label>Monto abonar</mat-label>
+                <input matInput type="number" matNumberInput [min]="minimoMontoEfectivo" [formControl]="txMontoAbonar">
+                <mat-error *ngIf="txMontoAbonar?.hasError('required')">Campo requerido</mat-error>
+                <mat-error *ngIf="txMontoAbonar?.hasError('pattern')">Valor incorrecto, debe ser un número hasta dos decimales</mat-error>
+                <mat-error *ngIf="txMontoAbonar?.hasError('min')">El monto mínimo debe ser {{pedido.precio | currency}}</mat-error>
+              </mat-form-field>
+            </div>
+            <div class="col-sm-6">
+              <mat-form-field appearance="outline" style="width: 80%">
+                <mat-label>Vuelto</mat-label>
+                <input matInput type="text" disabled [value]="permiteVerVuelto() ? calcularVuelto().toString() : '' | currency">
+                <mat-error *ngIf="txMontoAbonar?.hasError('required')">Campo requerido</mat-error>
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+        <app-pago-tarjeta #pagoTarjeta *ngIf="rbTiposPago?.value === tarjetaVisa">
+        </app-pago-tarjeta>
       </mat-step>
     </mat-horizontal-stepper>
     <div class="row pt-3">
       <div class="col text-end">
         <div class="float-right">
-          <button class="btn me-3" mat-raised-button
-                  (click)="cancelar()">
-            Cancelar
-          </button><button class="btn" mat-raised-button
+          <button *ngIf="step3Completado" class="btn me-3" mat-raised-button
+                  (click)="mostrarPedido()">
+            Ver pedido
+          </button>
+          <button *ngIf="permiteVerBotonFinalizar() && !step3Completado" class="btn me-3" mat-raised-button
+                  [disabled]="!permiteFinalizar()"
+                  (click)="finalizarPedido()">
+            Finalizar
+          </button>
+          <button *ngIf="permiteVerBotonSiguiente()" class="btn" mat-raised-button
                   [disabled]="!permiteAvanzarStep()"
                   (click)="siguienteStep()">
             Siguiente

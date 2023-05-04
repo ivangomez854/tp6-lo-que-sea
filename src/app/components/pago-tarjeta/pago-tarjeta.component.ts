@@ -3,15 +3,29 @@ import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {Moment} from "moment";
 import {MatDatepicker} from "@angular/material/datepicker";
 import {NgxSpinnerService} from "ngx-spinner";
+import {MAT_DATE_FORMATS} from '@angular/material/core';
+
 
 @Component({
   selector: 'app-pago-tarjeta',
   templateUrl: './pago-tarjeta.component.html',
-  styleUrls: ['./pago-tarjeta.component.scss']
+  styleUrls: ['./pago-tarjeta.component.scss'],
+  providers: [
+    { provide: MAT_DATE_FORMATS, useValue: {
+        parse: {
+          dateInput: 'MM/YYYY',
+        },
+        display: {
+          dateInput: 'MM/YYYY',
+          monthYearLabel: 'MMM YYYY',
+          dateA11yLabel: 'MM/YYYY',
+          monthYearA11yLabel: 'MMMM YYYY',
+        },
+      }
+    }
+  ]
 })
 export class PagoTarjetaComponent {
-  @Output() resultadoPago: EventEmitter<boolean> = new EventEmitter<boolean>();
-
   form: FormGroup;
 
   constructor(private fb: FormBuilder,
@@ -38,16 +52,6 @@ export class PagoTarjetaComponent {
 
   permitePagar(): boolean {
     return this.txNombreTitular.valid && this.txNumeroTarjeta.valid && this.txCodigoSeguridad.valid && this.dpVencimiento.valid;
-  }
-
-  realizarPago() {
-    if(this.permitePagar()) {
-      this.spinnerService.show();
-      setTimeout(()=> {
-        this.resultadoPago.emit(true);
-      this.spinnerService.hide()
-      }, 5000);
-    }
   }
 
   get txNombreTitular(): FormControl {

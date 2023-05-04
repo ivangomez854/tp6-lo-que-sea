@@ -37,7 +37,7 @@ export class DomicilioComponent implements  OnInit{
   }
 
   obtenerDomicilioConcatenado(): string {
-    return this.txCalle.value + ' ' + +this.txNumero.value + ' - Cdad. ' + this.obtenerCiudad() + ' - Ref: ' + this.txReferencias.value;
+    return this.txCalle.value + ' ' + (+this.txNumero.value) + ' - Cdad. ' + this.obtenerCiudad() + `${this.txReferencias.value ? ' - Ref: '+this.txReferencias.value : ''}`;
   }
 
   get txCalle(): FormControl {

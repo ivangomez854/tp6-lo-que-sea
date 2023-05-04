@@ -2,6 +2,17 @@ mat-hint {
   font-size: smaller;
 }
 
+.total {
+  background-color: #f95738;
+  color: #0D3B66;
+  border-radius: 4px;
+  height: 56px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 ::ng-deep mat-card {
   background-color: #faf0ca!important;
 }

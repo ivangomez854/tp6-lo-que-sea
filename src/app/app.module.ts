@@ -61,18 +61,6 @@ registerLocaleData(localeEs);
     ],
   providers: [{ provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMATS },
     { provide: MAT_DATE_LOCALE, useValue: 'es' },
-    { provide: MAT_DATE_FORMATS, useValue: {
-        parse: {
-          dateInput: 'MM/YYYY',
-        },
-        display: {
-          dateInput: 'MM/YYYY',
-          monthYearLabel: 'MMM YYYY',
-          dateA11yLabel: 'MM/YYYY',
-          monthYearA11yLabel: 'MMMM YYYY',
-        },
-      }
-    },
     DatePipe
   ],
   bootstrap: [AppComponent]

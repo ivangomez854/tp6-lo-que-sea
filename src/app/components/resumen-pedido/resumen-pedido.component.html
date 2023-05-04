@@ -1,1 +1,141 @@
-<p>resumen-pedido works!</p>
+<div class="container">
+
+  <mat-card class="mat-elevation-z4 card-resumen">
+    <div class="row" *ngIf="esPedidoFinalizado">
+      <div class="col-6 text-start"><b>{{pedido?.fechaPedido | date: 'dd/MM/yyyy HH:mm'}}</b></div>
+      <div class="col-6 text-end"><b>N° de pedido: {{pedido?.numeroPedido || ''}}</b></div>
+    </div>
+    <div class="row text-center">
+      <h1>{{titulo}}</h1>
+    </div>
+
+    <div class="producto">
+      <h3>Producto</h3>
+      <div class="row">
+        <mat-form-field appearance="outline" style="width: 100%">
+          <mat-label>Descripción:</mat-label>
+          <input matInput disabled [value]="pedido?.descripcionProducto | uppercase">
+        </mat-form-field>
+      </div>
+      <div class="row">
+        <mat-form-field appearance="outline" style="width: 100%">
+          <mat-label>Archivo foto:</mat-label>
+          <input matInput disabled [value]="pedido?.archivoAdjunto || 'No adjunta'">
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="comercio">
+      <h3>Dirección del comercio</h3>
+      <div class="row">
+        <mat-form-field appearance="outline" style="width: 100%">
+          <mat-label>Direccion:</mat-label>
+          <input matInput disabled [value]="pedido?.direccionComercio | uppercase">
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="entrega">
+      <h3>Dirección de entrega</h3>
+      <div class="row">
+        <mat-form-field appearance="outline" style="width: 100%">
+          <mat-label>Direccion:</mat-label>
+          <input matInput disabled [value]="pedido?.direccionComercio | uppercase">
+        </mat-form-field>
+      </div>
+      <h3>Entrega</h3>
+      <div class="row" *ngIf="pedido?.tipoEnvio === loAntesPosible">
+        <mat-form-field appearance="outline" style="width: 100%">
+          <mat-label>Fecha y hora:</mat-label>
+          <input matInput disabled value="LO ANTES POSIBLE">
+        </mat-form-field>
+      </div>
+      <div class="row" *ngIf="pedido?.tipoEnvio === pactarFecha">
+        <mat-form-field appearance="outline" style="width: 100%">
+          <mat-label>Fecha y hora:</mat-label>
+          <input matInput disabled [value]="pedido?.momentoEntrega">
+        </mat-form-field>
+      </div>
+    </div>
+  </mat-card>
+
+  <mat-card class="mat-elevation-z4 text-center">
+    <img [src]="imgSrc" width="100%">
+  </mat-card>
+
+  <mat-card class="p-0 mt-1 mat-elevation-z4">
+    <div class="row ps-2 pe-2">
+      <div class="col-sm-6 col-distancia text-center">
+        <h4>Distancia en Km.</h4>
+        <span class="costo">{{pedido?.distanciaKm}}</span>
+      </div>
+      <div class="col-sm-6 col-costo text-center">
+        <h4>Costo del servicio</h4>
+        <span class="costo">{{pedido?.precio | currency}}</span>
+      </div>
+    </div>
+  </mat-card>
+
+  <mat-card class="p-0 mt-1 mat-elevation-z4" *ngIf="esPedidoFinalizado">
+    <h3>Datos del pago</h3>
+    <div class="row ps-2 pe-2" *ngIf="!pedido?.tarjeta; else tarjeta">
+      <div class="col-sm-4">
+        <mat-form-field appearance="outline" style="width: 100%">
+          <mat-label>Medio de pago:</mat-label>
+          <input matInput disabled value="EFECTIVO">
+        </mat-form-field>
+      </div>
+      <div class="col-sm-4">
+        <mat-form-field appearance="outline" style="width: 100%">
+          <mat-label>Monto a pagar:</mat-label>
+          <input matInput disabled value="{{pedido.montoAbonar | currency}}">
+        </mat-form-field>
+      </div>
+      <div class="col-sm-4">
+        <mat-form-field appearance="outline" style="width: 100%">
+          <mat-label>Monto de vuelto:</mat-label>
+          <input matInput disabled value="{{pedido.montoVuelto | currency}}">
+        </mat-form-field>
+      </div>
+    </div>
+
+    <ng-template #tarjeta>
+      <div class="row">
+        <div class="col-sm-4">
+          <mat-form-field appearance="outline" style="width: 100%">
+            <mat-label>Medio de pago:</mat-label>
+            <input matInput disabled value="{{pedido.tarjeta?.entidad}}">
+          </mat-form-field>
+        </div>
+        <div class="col-sm-4">
+          <mat-form-field appearance="outline" style="width: 100%">
+            <mat-label>Titular:</mat-label>
+            <input matInput disabled value="{{pedido.tarjeta?.nombreTitular}}">
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-6">
+          <mat-form-field appearance="outline" style="width: 100%">
+            <mat-label>Número de tarjeta:</mat-label>
+            <input matInput disabled value="{{pedido.tarjeta?.numeroTarjeta}}">
+          </mat-form-field>
+        </div>
+        <div class="col-sm-6">
+          <mat-form-field appearance="outline" style="width: 100%">
+            <mat-label>Vencimiento:</mat-label>
+            <input matInput disabled value="{{pedido.tarjeta?.vencimiento | date: 'MM/yyyy'}}">
+          </mat-form-field>
+        </div>
+      </div>
+    </ng-template>
+  </mat-card>
+
+  <div mat-dialog-actions class="d-flex justify-content-end">
+    <button
+      class="btn" mat-icon-button mat-dialog-close
+      matTooltip="Aceptar">
+      <mat-icon>arrow_right_alt</mat-icon>
+    </button>
+  </div>
+</div>

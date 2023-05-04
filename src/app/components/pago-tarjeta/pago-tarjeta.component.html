@@ -17,6 +17,7 @@
         <mat-hint class="text-info">16 dígitos</mat-hint>
         <mat-error *ngIf="txNumeroTarjeta?.hasError('required')">Campo requerido</mat-error>
         <mat-error *ngIf="txNumeroTarjeta?.hasError('pattern')">El número no corresponde a una tarjeta Visa</mat-error>
+        <mat-error *ngIf="txNumeroTarjeta?.hasError('matDatePickerMin')">La fecha debe ser superior a la actual</mat-error>
       </mat-form-field>
     </div>
   </div>
@@ -53,15 +54,4 @@
       </mat-form-field>
     </div>
   </div>
-
-  <div class="float-end">
-    <button mat-raised-button
-            type="button"
-            class="btn"
-            (click)="realizarPago()"
-            [ngClass]="permitePagar() ? 'btn-primary' : ''"
-            [disabled]="!permitePagar()"
-    >REALIZAR PAGO</button>
-  </div>
-
 </form>

@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectorRef, Component, OnInit, ViewChild} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {MatStepper} from "@angular/material/stepper";
 import {DomicilioComponent} from "../domicilio/domicilio.component";
@@ -10,6 +10,9 @@ import {PagoTarjetaComponent} from "../pago-tarjeta/pago-tarjeta.component";
 import {Pedido} from "../../models/pedido.model";
 import {DatePipe} from "@angular/common";
 import {TarjetaCredito} from "../../models/tarjeta-credito.model";
+import {MatDialog} from "@angular/material/dialog";
+import {ResumenPedidoComponent} from "../resumen-pedido/resumen-pedido.component";
+import {TiposPagoEnum} from "../../models/enums/tipos-pago.enum";
 
 
 @Component({
@@ -17,11 +20,11 @@ import {TarjetaCredito} from "../../models/tarjeta-credito.model";
   templateUrl: './registrar-pedido-lo-que-sea.component.html',
   styleUrls: ['./registrar-pedido-lo-que-sea.component.scss']
 })
-export class RegistrarPedidoLoQueSeaComponent implements OnInit{
+export class RegistrarPedidoLoQueSeaComponent implements OnInit {
   @ViewChild('steper') stepper: MatStepper;
   @ViewChild('domicilioComercio', {static: true}) domicilioComercio: DomicilioComponent;
   @ViewChild('domicilioEntrega', {static: true}) domicilioEntrega: DomicilioComponent;
-  @ViewChild('pagoTarjeta', {static: true}) pagoTarjeta: PagoTarjetaComponent;
+  @ViewChild('pagoTarjeta') pagoTarjeta: PagoTarjetaComponent;
 
   form: FormGroup;
   step1Completado = false;
@@ -29,11 +32,15 @@ export class RegistrarPedidoLoQueSeaComponent implements OnInit{
   step3Completado = false;
 
   pedido: Pedido = new Pedido();
+  private precioKm = 10;
+  public pagado: boolean;
 
 
   constructor(private fb: FormBuilder,
               private spinnerService: NgxSpinnerService,
-              private datePipe: DatePipe) {
+              private datePipe: DatePipe,
+              private dialog: MatDialog,
+              private cdr: ChangeDetectorRef) {
   }
 
   ngOnInit() {
@@ -50,6 +57,10 @@ export class RegistrarPedidoLoQueSeaComponent implements OnInit{
         rbTiposEnvio: [TiposEnvioEnum.LO_ANTES_POSIBLE, [Validators.required]],
         dpFechaEnvio: [''],
         tpHoraEnvio: ['']
+      }),
+      fgPago: this.fb.group({
+        rbTiposPago: [TiposPagoEnum.EFECTIVO, [Validators.required]],
+        txMontoAbonar: ['', [Validators.required, Validators.pattern(/^(\d+)([,.]\d{1,2})?$/)]]
       })
       // fgDomicilioEntrega
 
@@ -58,8 +69,8 @@ export class RegistrarPedidoLoQueSeaComponent implements OnInit{
     this.rbTiposEnvio.valueChanges.pipe(distinctUntilChanged())
       .subscribe(res => {
         if (res === this.loAntesPosible) {
-          this.fgMomentoRecepcion.reset();
-
+          this.dpFechaEnvio.reset();
+          this.tpHoraEnvio.reset();
         } else {
           this.dpFechaEnvio.setValidators([Validators.required]);
           this.tpHoraEnvio.setValidators([Validators.required]);
@@ -71,6 +82,16 @@ export class RegistrarPedidoLoQueSeaComponent implements OnInit{
         if (res) {
           this.validarHoraMinima();
         }
+      });
+
+    this.rbTiposPago.valueChanges.pipe(distinctUntilChanged())
+      .subscribe(res => {
+        if (res === this.efectivo) {
+          this.txMontoAbonar.reset();
+        } else {
+          this.txMontoAbonar.setValidators([Validators.required]);
+        }
+        this.cdr.detectChanges();
       });
   }
 
@@ -102,21 +123,79 @@ export class RegistrarPedidoLoQueSeaComponent implements OnInit{
       horaMinima.setMinutes(horaMinima.getMinutes() + 30);
     }
     if (horaSeleccionada < horaMinima) {
-      this.tpHoraEnvio.setErrors({ horaInvalida: {mensaje: 'Para envios en el día, la hora mínima debe ser 30 minutos posteriores a la creación del pedido.'}});
+      this.tpHoraEnvio.setErrors({horaInvalida: {mensaje: 'Para envios en el día, la hora mínima debe ser 30 minutos posteriores a la creación del pedido.'}});
     }
   }
 
-  generarResumenPedidoPagado(resultado: boolean) {
-    if(resultado) {
-      const tarjeta = new TarjetaCredito();
-      tarjeta.entidad = 'VISA';
-      tarjeta.nombreTitular = this.pagoTarjeta.txNombreTitular.value;
-      tarjeta.numeroTarjeta = this.pagoTarjeta.txNumeroTarjeta.value;
-      // tarjeta.vencimiento = this.datePipe.transform(this.pagoTarjeta?.dpVencimiento?.value?.toDate(), 'dd/MM/yyyy'); //TODO VER COMO RESOLVER EL MOMENT
-      this.pedido.tarjeta = tarjeta;
+  permiteVerVuelto(): boolean {
+    return !!this.pedido.precio && (+this.rbTiposPago.value === this.efectivo) && (+this.txMontoAbonar.value > this.pedido.precio);
+  }
 
-      console.table(this.pedido);
+  calcularVuelto(): number {
+    return +(this.txMontoAbonar.value - this.pedido.precio)?.toFixed(2);
+  }
+
+  private calcularDistanciaMonto() {
+    const min = 1;
+    const max = 15;
+    const distanciaKm = +(Math.random() * (max - min) + min).toFixed(2);
+    this.pedido.distanciaKm = distanciaKm;
+    this.pedido.precio = distanciaKm * this.precioKm;
+  }
+
+  private calcularNumeroPedido(): string {
+    const randomNumber = Math.floor(Math.random() * 1000000); // Genera un número aleatorio entre 0 y 999999
+    const paddedNumber = randomNumber.toString().padStart(6, '0'); // Completa con ceros a la izquierda hasta una cadena de 6 dígitos
+    return paddedNumber;
+  }
+
+  permiteFinalizar(): boolean {
+    return this.step1Completado && this.step2Completado &&
+      ((+this.rbTiposPago.value === this.efectivo && this.txMontoAbonar.valid) ||
+        (!!this.pagoTarjeta && this.pagoTarjeta.permitePagar()));
+  }
+
+  finalizarPedido() {
+    if (this.permiteFinalizar()) {
+      this.pedido.tipoPago = this.rbTiposPago.value;
+      this.pedido.fechaPedido = new Date();
+      this.pedido.numeroPedido = this.calcularNumeroPedido();
+      switch (this.pedido.tipoPago) {
+        case  TiposPagoEnum.EFECTIVO: {
+          this.pedido.montoAbonar = +this.txMontoAbonar.value;
+          this.pedido.montoVuelto = this.permiteVerVuelto() ? this.calcularVuelto() : this.pedido.montoVuelto;
+          break;
+        }
+        case TiposPagoEnum.TARJETA_VISA: {
+          const tarjeta = new TarjetaCredito();
+          tarjeta.entidad = 'VISA';
+          tarjeta.nombreTitular = this.pagoTarjeta.txNombreTitular.value;
+          tarjeta.numeroTarjeta = this.pagoTarjeta.txNumeroTarjeta.value;
+          tarjeta.vencimiento = this.pagoTarjeta?.dpVencimiento?.value?.toDate();
+          this.pedido.tarjeta = tarjeta;
+        }
+      }
+      this.form.disable()
+      this.domicilioComercio.form.disable();
+      this.domicilioEntrega.form.disable();
+      this.completarStep3();
+
+      this.spinnerService.show();
+      setTimeout(() => {
+        this.spinnerService.hide();
+        this.mostrarPedido();
+      }, 3000);
     }
+  }
+
+  mostrarPedido() {
+    this.dialog.open(ResumenPedidoComponent, {
+      data: {pedido: this.pedido},
+      autoFocus: false,
+      disableClose: true,
+      width: 'auto',
+      height: '90vh'
+    });
   }
 
   //region stepper
@@ -129,15 +208,16 @@ export class RegistrarPedidoLoQueSeaComponent implements OnInit{
         setTimeout(() => {
           this.spinnerService.hide()
           this.stepper.next();
-        }, 3000);
+        }, 2000);
         break;
       case 1:
         this.completarStep2();
         this.spinnerService.show()
         setTimeout(() => {
           this.spinnerService.hide()
+          this.mostrarPedido();
           this.stepper.next();
-        }, 3000);
+        }, 2000);
         break;
       case 2:
         this.completarStep3();
@@ -167,6 +247,14 @@ export class RegistrarPedidoLoQueSeaComponent implements OnInit{
     }
   }
 
+  permiteVerBotonSiguiente(): boolean {
+    return this.stepper?.selectedIndex !== 2;
+  }
+
+  permiteVerBotonFinalizar(): boolean {
+    return this.stepper?.selectedIndex === 2;
+  }
+
   esValidoStep1(): boolean {
     return this.fgPedido.valid && this.domicilioComercio.form.valid;
   }
@@ -177,11 +265,14 @@ export class RegistrarPedidoLoQueSeaComponent implements OnInit{
   }
 
   completarStep1() {
-      this.pedido.descripcionProducto = this.txDescripcion.value || '';
-      this.pedido.archivoAdjunto = this.txFoto.value || '';
-      this.pedido.direccionComercio = this.domicilioComercio.obtenerDomicilioConcatenado() || '';
-      this.step1Completado = true;
-      console.table(this.pedido);
+    this.pedido.descripcionProducto = this.txDescripcion.value || '';
+    this.pedido.archivoAdjunto = this.txFoto.value || '';
+    this.pedido.direccionComercio = this.domicilioComercio.obtenerDomicilioConcatenado() || '';
+    this.pedido.idCiudad = this.domicilioComercio.cbCiudad.value;
+    this.domicilioEntrega.cbCiudad.setValue(this.domicilioComercio.cbCiudad.value);
+    this.domicilioEntrega.cbCiudad.disable();
+    this.step1Completado = true;
+    console.table(this.pedido);
   }
 
   completarStep2() {
@@ -190,6 +281,7 @@ export class RegistrarPedidoLoQueSeaComponent implements OnInit{
     if (this.pedido.tipoEnvio === TiposEnvioEnum.PACTAR_FECHA) {
       this.pedido.momentoEntrega = 'Fecha: ' + this.datePipe.transform(this.dpFechaEnvio.value, 'dd/MM/yyyy') + ' Hora: ' + this.tpHoraEnvio.value;
     }
+    this.calcularDistanciaMonto();
     this.step2Completado = true;
     console.table(this.pedido);
   }
@@ -198,21 +290,10 @@ export class RegistrarPedidoLoQueSeaComponent implements OnInit{
     this.step3Completado = true;
   }
 
-  cancelar() {
-    this.stepper.reset();
-    this.stepper.disableRipple = true;
-    this.fgPedido.reset();
-    this.fgMomentoRecepcion.reset();
-    this.form.clearValidators();
-    this.domicilioEntrega.form.reset();
-    this.domicilioComercio.form.reset();
-    this.pagoTarjeta.form.reset();
-
-  }
-
   desactivarStepsPedido() {
     this.stepper.disableRipple = false;
   }
+
   //endregion
 
   //region getters
@@ -244,6 +325,18 @@ export class RegistrarPedidoLoQueSeaComponent implements OnInit{
     return this.fgMomentoRecepcion.get('tpHoraEnvio') as FormControl;
   }
 
+  get fgPago(): FormGroup {
+    return this.form.get('fgPago') as FormGroup;
+  }
+
+  get rbTiposPago(): FormControl {
+    return this.fgPago.get('rbTiposPago') as FormControl;
+  }
+
+  get txMontoAbonar(): FormControl {
+    return this.fgPago.get('txMontoAbonar') as FormControl;
+  }
+
   get maxTamanioArchivos(): number {
     return 5 * 1024 * 1024; // Tamaño máximo en bytes
   }
@@ -254,6 +347,14 @@ export class RegistrarPedidoLoQueSeaComponent implements OnInit{
 
   get pactarFecha(): TiposEnvioEnum {
     return TiposEnvioEnum.PACTAR_FECHA;
+  }
+
+  get efectivo(): TiposPagoEnum {
+    return TiposPagoEnum.EFECTIVO;
+  }
+
+  get tarjetaVisa(): TiposPagoEnum {
+    return TiposPagoEnum.TARJETA_VISA;
   }
 
   get fechaActual(): Date {
@@ -267,5 +368,10 @@ export class RegistrarPedidoLoQueSeaComponent implements OnInit{
   get fechaMaxima(): Date {
     return new Date(this.fechaActual.getTime() + 7 * 24 * 60 * 60000); // Sumar 7 días en milisegundos
   }
+
+  get minimoMontoEfectivo(): number | null {
+    return this.pedido.precio && this.rbTiposPago.value === this.efectivo ? this.pedido.precio : null;
+  }
+
   //endregion
 }
