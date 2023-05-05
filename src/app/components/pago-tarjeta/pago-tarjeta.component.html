@@ -5,6 +5,7 @@
         <mat-label>NOMBRE Y APELLIDO DEL TITULAR</mat-label>
         <input matInput [formControl]="txNombreTitular">
         <mat-error *ngIf="txNombreTitular?.hasError('required')">Campo requerido</mat-error>
+        <mat-error *ngIf="txNombreTitular?.hasError('onlySpaces')">No pueden ser solo espacios</mat-error>
       </mat-form-field>
     </div>
   </div>

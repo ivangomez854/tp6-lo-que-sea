@@ -1,5 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
+import {notOnlySpacesValidator} from "../../shared/validators/custom-validators";
 
 @Component({
   selector: 'app-domicilio',
@@ -20,9 +21,9 @@ export class DomicilioComponent implements  OnInit{
 
   private crearForm() {
     this.form = this.fb.group({
-      txCalle: ['', Validators.required],
-      txNumero: ['', Validators.required],
-      cbCiudad: [null, Validators.required],
+      txCalle: ['', [Validators.required, notOnlySpacesValidator]],
+      txNumero: ['', [Validators.required]],
+      cbCiudad: [null, [Validators.required]],
       txReferencias: ['']
     })
   }

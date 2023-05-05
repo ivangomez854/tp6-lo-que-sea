@@ -4,6 +4,7 @@ import {Moment} from "moment";
 import {MatDatepicker} from "@angular/material/datepicker";
 import {NgxSpinnerService} from "ngx-spinner";
 import {MAT_DATE_FORMATS} from '@angular/material/core';
+import {notOnlySpacesValidator} from "../../shared/validators/custom-validators";
 
 
 @Component({
@@ -38,7 +39,7 @@ export class PagoTarjetaComponent {
 
   private crearForm() {
     this.form = this.fb.group({
-      txNombreTitular: ['', [Validators.required, Validators.maxLength(20)]],
+      txNombreTitular: ['', [Validators.required, Validators.maxLength(20), notOnlySpacesValidator]],
       txNumeroTarjeta: ['', [Validators.required, Validators.maxLength(16), Validators.pattern(/^4[0-9]{15}$/)]],
       dpVencimiento: ['', [Validators.required, Validators.maxLength(7)]],
       txCodigoSeguridad: ['', [Validators.required, Validators.pattern(/^[0-9]{3}$/), Validators.maxLength(3)]]

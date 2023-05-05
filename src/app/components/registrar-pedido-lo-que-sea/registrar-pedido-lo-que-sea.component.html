@@ -13,11 +13,12 @@
               <textarea matInput rows="2" style="resize: none" [formControl]="txDescripcion"></textarea>
               <mat-error *ngIf="txDescripcion?.hasError('required')">Campo requerido</mat-error>
               <mat-error *ngIf="txDescripcion?.hasError('maxlength')">Permitido hasta 20 caracteres</mat-error>
+              <mat-error *ngIf="txDescripcion?.hasError('onlySpaces')">No pueden ser solo espacios</mat-error>
             </mat-form-field>
           </div>
         </div>
 
-        <div class="row">
+        <div class="row pt-3">
           <div class="col-sm-6 col-12">
             <input
               type="file"

@@ -13,6 +13,7 @@ import {TarjetaCredito} from "../../models/tarjeta-credito.model";
 import {MatDialog} from "@angular/material/dialog";
 import {ResumenPedidoComponent} from "../resumen-pedido/resumen-pedido.component";
 import {TiposPagoEnum} from "../../models/enums/tipos-pago.enum";
+import {notOnlySpacesValidator} from "../../shared/validators/custom-validators";
 
 
 @Component({
@@ -51,7 +52,7 @@ export class RegistrarPedidoLoQueSeaComponent implements OnInit {
   crearForm() {
     this.form = this.fb.group({
       fgPedido: this.fb.group({
-        txDescripcion: ['', [Validators.required, Validators.maxLength(20)]],
+        txDescripcion: ['', [Validators.required, Validators.maxLength(20), notOnlySpacesValidator]],
         txFoto: [null]
       }),
       fgMomentoRecepcion: this.fb.group({

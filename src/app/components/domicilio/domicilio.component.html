@@ -10,6 +10,7 @@
       <mat-label>Calle</mat-label>
       <input matInput [formControl]="txCalle">
       <mat-error *ngIf="txCalle?.hasError('required')">Campo requerido</mat-error>
+      <mat-error *ngIf="txCalle?.hasError('onlySpaces')">No pueden ser solo espacios</mat-error>
     </mat-form-field>
   </div>
   <div class="col-sm-2">
