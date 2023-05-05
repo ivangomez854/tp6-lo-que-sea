@@ -281,7 +281,7 @@ export class RegistrarPedidoLoQueSeaComponent implements OnInit {
     this.pedido.descripcionProducto = this.txDescripcion.value || '';
     this.pedido.archivoAdjunto = this.txFoto.value || '';
     this.pedido.direccionComercio = this.domicilioComercio.obtenerDomicilioConcatenado() || '';
-    this.pedido.idCiudad = this.domicilioComercio.cbCiudad.value;
+    this.pedido.idCiudad = +this.domicilioComercio.cbCiudad.value;
     this.domicilioEntrega.cbCiudad.setValue(this.domicilioComercio.cbCiudad.value);
     this.domicilioEntrega.cbCiudad.disable();
     this.step1Completado = true;

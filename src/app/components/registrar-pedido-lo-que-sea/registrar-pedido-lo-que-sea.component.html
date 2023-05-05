@@ -9,7 +9,7 @@
         <div class="row pt-2">
           <div class="col-sm-10">
             <mat-form-field appearance="outline" style="width: 100%">
-              <mat-label>Descipción</mat-label>
+              <mat-label>Descripción</mat-label>
               <textarea matInput rows="2" style="resize: none" [formControl]="txDescripcion"></textarea>
               <mat-error *ngIf="txDescripcion?.hasError('required')">Campo requerido</mat-error>
               <mat-error *ngIf="txDescripcion?.hasError('maxlength')">Permitido hasta 20 caracteres</mat-error>
